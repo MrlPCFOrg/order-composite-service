@@ -1,0 +1,15 @@
+---
+applications:
+- name: order-comp-service
+  instance: 1
+  memory: 1024M
+  host: order-comp-service
+  path: build\libs\order-comp-service-0.0.1-SNAPSHOT.jar
+  buildpack: https://github.com/cloudfoundry/java-buildpack.git
+  memory: 1024M
+  services:
+    - oms-eureka
+    - oms-circuitbreaker
+    - oms-mongo
+    - oms-configclient
+    - oms-rabbit
