@@ -1,0 +1,33 @@
+info:
+  description: "Service for Order CRUD operations"
+
+spring:
+  application:
+    name: order-comp-service
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/OMS
+
+
+oms:
+  appKey: order-comp-service
+  common:
+    web:
+      config:
+        swagger:
+          controllerPackage: com.oms.order.controller
+          author: Ashokkumar
+          apiName: order-comp-service
+          apiVersion: 1.0.0
+          apiDescription: API for Order-comp-service
+
+security:
+  basic:
+    enabled: false
+logging:
+  level:
+    root: DEBUG
+    org.springframework.web: ERROR
+    com.oms.order: DEBUG
+server:
+  port: 9098
