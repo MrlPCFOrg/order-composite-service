@@ -11,5 +11,5 @@ applications:
     - oms-eureka
     - oms-circuitbreaker
     - oms-mongo
-    - oms-configclient
+    - oms-configserver
     - oms-rabbit
