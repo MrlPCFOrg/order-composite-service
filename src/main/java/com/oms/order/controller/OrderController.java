@@ -1,6 +1,7 @@
 package com.oms.order.controller;
 
 import com.oms.order.model.request.OrderRequest;
+import com.oms.order.model.request.OrderStatusUpdate;
 import com.oms.order.model.request.OrderUpdate;
 import com.oms.order.model.response.OrderResponse;
 import com.oms.order.service.OrderService;
@@ -54,10 +55,14 @@ public class OrderController {
     }
 
     @PatchMapping("/{orderId}/update")
-    public OrderResponse updateOrder(@RequestBody OrderUpdate orderUpdate){
+    public void updateOrder(@PathVariable String orderId, @RequestBody OrderUpdate orderUpdate){
         LOGGER.info("message=updateOrder() orderUpdate{}", orderUpdate);
-        return orderService.updateOrder(orderUpdate);
+        orderService.updateOrder(orderUpdate, orderId);
     }
 
-
+    @PatchMapping("/update/status")
+    public void updateOrderStatus(@RequestBody OrderStatusUpdate orderStatusUpdate){
+        LOGGER.info("message=updateOrder() orderUpdate{}", orderStatusUpdate);
+        orderService.updateOrderStatus(orderStatusUpdate);
+    }
 }

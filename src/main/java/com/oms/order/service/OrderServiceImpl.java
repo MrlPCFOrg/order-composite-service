@@ -3,11 +3,14 @@ package com.oms.order.service;
 import com.oms.order.model.domain.Order;
 import com.oms.order.model.entity.OrderEntity;
 import com.oms.order.model.request.OrderRequest;
+import com.oms.order.model.request.OrderStatusUpdate;
 import com.oms.order.model.request.OrderUpdate;
 import com.oms.order.model.response.OrderResponse;
 import com.oms.order.repository.OrderRepository;
+import com.oms.order.repository.OrderRepositoryCustom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,6 +22,9 @@ public class OrderServiceImpl implements OrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderRepositoryCustom orderRepositoryCustom;
 
     public OrderServiceImpl(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
@@ -81,9 +87,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponse updateOrder(OrderUpdate orderUpdate) {
-        LOGGER.info("message=updateOrder()");
-        return null;
+    public void updateOrder(OrderUpdate orderUpdate, String orderId) {
+        orderRepositoryCustom.updateOrder(orderUpdate, orderId);
     }
 
+    @Override
+    public void updateOrderStatus(OrderStatusUpdate orderStatusUpdate) {
+        orderRepositoryCustom.updateOrderStatus(orderStatusUpdate.getOrderId(), orderStatusUpdate.getStatus());
+    }
 }

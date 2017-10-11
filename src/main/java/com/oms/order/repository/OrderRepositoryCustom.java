@@ -1,13 +1,10 @@
 package com.oms.order.repository;
 
 
-
-import java.util.List;
+import com.oms.order.model.request.OrderUpdate;
 
 public interface OrderRepositoryCustom {
-//    void updateProductsInInventory(List<InventoryUpdate> inventoryUpdate);
+    void updateOrderStatus(String orderId, String status);
 
-    void deleteProductsFromInventory(List<String> productIds);
-
-//    List<InventoryProduct> findAllInventoryProducts(List<String> productIdList);
+    void updateOrder(OrderUpdate orderUpdate, String orderId);
 }
