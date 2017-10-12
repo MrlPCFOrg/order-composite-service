@@ -46,6 +46,8 @@ dependencies {
 	compile('io.pivotal.spring.cloud:spring-cloud-services-starter-service-registry')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.codehaus.groovy:groovy-all:2.4.5')
+	compile('org.springframework.boot:spring-boot-starter-amqp')
+	compile('com.fasterxml.jackson.core:jackson-annotations')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('com.jayway.restassured:spring-mock-mvc:2.8.0')

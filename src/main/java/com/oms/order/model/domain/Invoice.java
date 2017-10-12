@@ -1,11 +1,14 @@
 package com.oms.order.model.domain;
 
 import com.google.common.base.MoreObjects;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
 public class Invoice {
     private String invoiceNumber;
+
+    @DateTimeFormat
     private Date invoiceDate;
 
     public String getInvoiceNumber() {
