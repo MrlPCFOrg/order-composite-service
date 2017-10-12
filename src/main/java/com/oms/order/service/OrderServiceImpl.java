@@ -1,14 +1,21 @@
 package com.oms.order.service;
 
 import com.oms.order.model.domain.Order;
+import com.oms.order.model.domain.OrderMessage;
 import com.oms.order.model.entity.OrderEntity;
 import com.oms.order.model.request.OrderRequest;
 import com.oms.order.model.request.OrderUpdate;
+import com.oms.order.model.response.CustomerCustom;
+import com.oms.order.model.response.CustomerResponse;
 import com.oms.order.model.response.OrderResponse;
 import com.oms.order.repository.OrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +27,22 @@ public class OrderServiceImpl implements OrderService {
 
     private OrderRepository orderRepository;
 
-    public OrderServiceImpl(OrderRepository orderRepository) {
+    @Autowired
+    RestTemplate restTemplate;
+
+    MessageDelegate messageDelegate;
+
+    @Bean
+    public RestTemplate getRestTemplate() {
+        return new RestTemplate();
+    }
+
+    @Value("${url.customerServiceURL}")
+    String customerServiceURL;
+
+    public OrderServiceImpl(OrderRepository orderRepository, MessageDelegate messageDelegate) {
         this.orderRepository = orderRepository;
+        this.messageDelegate = messageDelegate;
     }
 
     @Override
@@ -33,8 +54,28 @@ public class OrderServiceImpl implements OrderService {
             orderEntityList.add(orderEntity);
         });
         List<OrderEntity> orderEntityListInserted = orderRepository.insert(orderEntityList);
+        OrderEntity insteredOrder = orderEntityListInserted.get(0);
         LOGGER.info("message=addOrder{}", orderEntityListInserted);
+
+        OrderMessage orderMessage = new OrderMessage()
+                .setOrderId(insteredOrder.getOrderId())
+                .setCustomerName(getCustomerDetails(insteredOrder.getCustomerId()).getCustomerName())
+                .setCustomerEmailId(getCustomerDetails(insteredOrder.getCustomerId()).getEmail())
+                .setTotalCost(insteredOrder.getTotalCost())
+                .setPaymentMode(insteredOrder.getPaymentList().get(0).getPaymentMode())
+                .setPaymentStatus(insteredOrder.getPaymentList().get(0).getPaymentStatus());
+
+        messageDelegate.sendMessage(orderMessage);
+
         return buildOrderResponse(orderEntityListInserted);
+    }
+
+    private CustomerCustom getCustomerDetails(String customerId) {
+        CustomerCustom customerCustom = restTemplate.getForObject(customerServiceURL, CustomerCustom.class, customerId);
+            customerCustom.getCustomerName();
+            customerCustom.getPhoneNo();
+            customerCustom.getEmail();
+        return customerCustom;
     }
 
     @Override

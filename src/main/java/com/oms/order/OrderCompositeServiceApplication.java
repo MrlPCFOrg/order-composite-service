@@ -9,9 +9,9 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 @SpringBootApplication
 @EnableOMSCommonWeb
-@EnableOMSSecurity
+//@EnableOMSSecurity
 //@EnableEurekaClient
-@EnableCircuitBreaker
+//@EnableCircuitBreaker
 public class OrderCompositeServiceApplication {
 
 	public static void main(String[] args) {

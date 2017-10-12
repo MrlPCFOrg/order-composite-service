@@ -31,3 +31,15 @@ logging:
     com.oms.order: DEBUG
 server:
   port: 9098
+
+message:
+  orderBillingExchange: order-billing-exchange
+  orderBillingRoutingKey: order-billing-routingkey
+  orderBillingQueue: order-billing-queue
+
+  orderStatusExchange: order-status-exchange
+  orderStatusRoutingKey: order-status-routingkey
+  orderStatusQueue: order-status-queue
+
+url:
+  customerServiceURL: http://localhost:9091/customer/{customerId}
