@@ -5,7 +5,6 @@ import com.oms.order.model.request.OrderStatusUpdate;
 import com.oms.order.model.request.OrderUpdate;
 import com.oms.order.model.response.OrderResponse;
 import com.oms.order.service.OrderService;
-import com.oms.order.service.OrderServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -19,7 +18,7 @@ public class OrderController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
 
-    public OrderController(OrderServiceImpl orderService) {
+    public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
 
