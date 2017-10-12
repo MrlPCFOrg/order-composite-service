@@ -1,14 +1,17 @@
 package com.oms.order.service;
 
+import com.oms.order.model.domain.BillingEvent;
 import com.oms.order.model.domain.Order;
 import com.oms.order.model.domain.OrderMessage;
 import com.oms.order.model.entity.OrderEntity;
 import com.oms.order.model.request.OrderRequest;
+import com.oms.order.model.request.OrderStatusUpdate;
 import com.oms.order.model.request.OrderUpdate;
 import com.oms.order.model.response.CustomerCustom;
 import com.oms.order.model.response.CustomerResponse;
 import com.oms.order.model.response.OrderResponse;
 import com.oms.order.repository.OrderRepository;
+import com.oms.order.repository.OrderRepositoryCustom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -30,6 +34,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     RestTemplate restTemplate;
 
+    @Autowired
     MessageDelegate messageDelegate;
 
     @Bean
@@ -40,9 +45,15 @@ public class OrderServiceImpl implements OrderService {
     @Value("${url.customerServiceURL}")
     String customerServiceURL;
 
-    public OrderServiceImpl(OrderRepository orderRepository, MessageDelegate messageDelegate) {
+    @Value("${url.eventServiceURL}")
+    private String eventService_url;
+
+    @Autowired
+    private OrderRepositoryCustom orderRepositoryCustom;
+
+    public OrderServiceImpl(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
-        this.messageDelegate = messageDelegate;
+
     }
 
     @Override
@@ -57,6 +68,22 @@ public class OrderServiceImpl implements OrderService {
         OrderEntity insteredOrder = orderEntityListInserted.get(0);
         LOGGER.info("message=addOrder{}", orderEntityListInserted);
 
+        BillingEvent billingEvent = new BillingEvent();
+        billingEvent.setCreatedDate(new Date());
+        if (orderEntityListInserted.size() > 0) {
+            billingEvent.setStatus("success");
+        } else {
+            billingEvent.setStatus("failed");
+        }
+
+        billingEvent.setOrderId(insteredOrder.getOrderId());
+        billingEvent.setEventName("OrderCreation");
+
+        //Call to 'event-service' (IPC)
+        LOGGER.info("message=Call to event-service{}");
+        String eventURL = eventService_url + "/addEvent";
+        restTemplate.postForObject(eventURL, billingEvent, BillingEvent.class);
+
         OrderMessage orderMessage = new OrderMessage()
                 .setOrderId(insteredOrder.getOrderId())
                 .setCustomerName(getCustomerDetails(insteredOrder.getCustomerId()).getCustomerName())
@@ -65,6 +92,7 @@ public class OrderServiceImpl implements OrderService {
                 .setPaymentMode(insteredOrder.getPaymentList().get(0).getPaymentMode())
                 .setPaymentStatus(insteredOrder.getPaymentList().get(0).getPaymentStatus());
 
+        //Message to 'billing-service' (Rabbitmq)
         messageDelegate.sendMessage(orderMessage);
 
         return buildOrderResponse(orderEntityListInserted);
@@ -72,9 +100,9 @@ public class OrderServiceImpl implements OrderService {
 
     private CustomerCustom getCustomerDetails(String customerId) {
         CustomerCustom customerCustom = restTemplate.getForObject(customerServiceURL, CustomerCustom.class, customerId);
-            customerCustom.getCustomerName();
-            customerCustom.getPhoneNo();
-            customerCustom.getEmail();
+        customerCustom.getCustomerName();
+        customerCustom.getPhoneNo();
+        customerCustom.getEmail();
         return customerCustom;
     }
 
@@ -122,9 +150,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponse updateOrder(OrderUpdate orderUpdate) {
-        LOGGER.info("message=updateOrder()");
-        return null;
+    public void updateOrder(OrderUpdate orderUpdate, String orderId) {
+        orderRepositoryCustom.updateOrder(orderUpdate, orderId);
     }
 
+    @Override
+    public void updateOrderStatus(OrderStatusUpdate orderStatusUpdate) {
+        orderRepositoryCustom.updateOrderStatus(orderStatusUpdate.getOrderId(), orderStatusUpdate.getStatus());
+    }
 }

@@ -25,8 +25,11 @@ public class MessageDelegate {
     @Value("${message.orderBillingRoutingKey}")
     private String routingKey;
 
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
+    private RabbitTemplate rabbitTemplate ;
+
+    public MessageDelegate( RabbitTemplate rabbitTemplate){
+        this.rabbitTemplate = rabbitTemplate;
+    }
 
     public void sendMessage(OrderMessage orderMessage){
         try{

@@ -19,47 +19,47 @@ import org.springframework.context.annotation.Configuration;
 public class MessageConfig {
 
     @Value("${message.orderStatusQueue}")
-    private String orderBillingQueue;
+    private String orderStatusQueue;
 
     @Value("${message.orderStatusExchange}")
-    private  String  orderBillingExchange;
+    private  String  orderStatusExchange;
 
     @Value("${message.orderStatusRoutingKey}")
-    private  String  orderBillingRoutingKey;
+    private  String  orderStatusRoutingKey;
 
 
     @Autowired
     private ConnectionFactory connectionFactory;
 
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
+    /*@Autowired
+    private RabbitTemplate rabbitTemplate;*/
 
     @Bean
     Queue queue() {
-        return new Queue(orderBillingQueue, false);
+        return new Queue(orderStatusQueue, false);
     }
 
     @Bean
     TopicExchange exchange() {
-        return new TopicExchange(orderBillingExchange);
+        return new TopicExchange(orderStatusExchange);
     }
 
     @Bean
     Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(orderBillingRoutingKey);
+        return BindingBuilder.bind(queue).to(exchange).with(orderStatusRoutingKey);
     }
 
-    @Bean
+    /*@Bean
     public RabbitTemplate getRabbitTemplate(ConnectionFactory connectionFactory) {
         rabbitTemplate = new RabbitTemplate(connectionFactory);
         return rabbitTemplate;
-    }
+    }*/
 
     @Bean
     SimpleMessageListenerContainer container(ConnectionFactory connectionFactory, MessageListenerAdapter listenerAdapter) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(orderBillingQueue);//Queue name reads from CONFIG Repository
+        container.setQueueNames(orderStatusQueue);//Queue name reads from CONFIG Repository
         container.setMessageListener(listenerAdapter);
 
         return container;

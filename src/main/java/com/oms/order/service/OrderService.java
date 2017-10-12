@@ -1,6 +1,7 @@
 package com.oms.order.service;
 
 import com.oms.order.model.request.OrderRequest;
+import com.oms.order.model.request.OrderStatusUpdate;
 import com.oms.order.model.request.OrderUpdate;
 import com.oms.order.model.response.OrderResponse;
 
@@ -15,5 +16,7 @@ public interface OrderService {
 
     OrderResponse getOrderByOrderIdCustomerId(String orderId, String customerId);
 
-    OrderResponse updateOrder(OrderUpdate orderUpdate);
+    void updateOrder(OrderUpdate orderUpdate, String orderId);
+
+    void updateOrderStatus(OrderStatusUpdate orderStatusUpdate);
 }
